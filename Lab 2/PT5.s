@@ -1,50 +1,64 @@
 .data
-A: .word 
-B: .word
-C: .word
+A: .word 0
+B: .word 0
+C: .word 0
 
 .text
-addi t0,zero,5 # i = 5
-addi t1,zero,10 # j = 10
+main:
+	addi t0,zero,5 # i = 5
+	addi t1,zero,10 # j = 10
+	
+	# Call 1
+	addi sp,sp,-8
+	sw t0,0(sp)
+	sw t1,4(sp)
+	
+	mv a0,t0
+	jal additup
+	
+	lw t1,4(sp)
+	lw t0,0(sp)
+	addi sp,sp,8
+	
+	la t6,A
+	sw a0,0(t6)
+	
+	# Call 2
+	addi sp,sp,-8
+	sw t0,0(sp)
+	sw t1,4(sp)
+	
+	mv a0,t1
+	jal additup
+	
+	lw t1,4(sp)
+	lw t0,0(sp)
+	addi sp,sp,8
+	
+	la t6,B
+	sw a0,0(t6)
+	
+	# Operation
+	lw t6,A
+	lw t5,B
+	la t4,C
+	add t6,t6,t5
+	sw t6,0(t4)
+	
+	j exit
+	
+additup:
+	mv t0,zero # i = 0
+	mv t2,zero # x = 0
+	mv t1,a0 # n = arg
+loopstart: 
+	addi t2,t2,1 
+	add t2,t2,t0
+	addi t0,t0,1 # i++
+	BLT t0,t1,loopstart # if i < n then loop
+	mv a0,t2
+	ret 
+exit:
 
-add a2,zero,t0
-addi sp,sp,-4
-sw t1,0(sp)
-j ADDITUP
-mv t0,a2
-lw t1,0(sp)
-addi sp,sp,4
-sw a0,A
 
-mv a2,t2
-addi sp,sp,-4
-sw t0,0(sp)
-j ADDITUP
-mv t1,a2
-lw t0,0(sp)
-addi sp,sp,4
-sw a0,B,t6
-
-lw t2,A
-lw t3,B
-add t4,t2,t3
-sw t4,C
-
-j EXIT
-
-ADDITUP:
-mv t0,zero
-mv a0,zero
-j LOOP
-ret
-
-LOOP:
-BLT a2,t0,4(ra)
-add a0,a0,t0
-addi a0,a0,1
-j LOOP
-
-
-
-EXIT:
 
